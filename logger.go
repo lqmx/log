@@ -41,6 +41,7 @@ type logger struct {
 
 func New(c Config) Logger {
 	var l logger
+	SetTraceId()
 
 	if c.Module == "" {
 		c.Module = "UNKNOWN"

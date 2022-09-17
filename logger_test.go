@@ -12,9 +12,6 @@ func TestLog(t *testing.T) {
 		Module:   "log",
 	}))
 
-	SetTraceId()
-	defer DelTraceId()
-
 	Debugf(DEBUG.String())
 	Infof(INFO.String())
 	Printf(INFO.String())

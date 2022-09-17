@@ -15,25 +15,25 @@ func TestLog(t *testing.T) {
 	SetTraceId()
 	defer DelTraceId()
 
-	log.Debugf(DEBUG.String())
-	log.Infof(INFO.String())
-	log.Printf(INFO.String())
-	log.Warnf(WARN.String())
-	log.Errorf(ERROR.String())
+	Debugf(DEBUG.String())
+	Infof(INFO.String())
+	Printf(INFO.String())
+	Warnf(WARN.String())
+	Errorf(ERROR.String())
 
 	Go(func() {
-		log.Debugf(DEBUG.String())
-		log.Infof(INFO.String())
-		log.Printf(INFO.String())
-		log.Warnf(WARN.String())
-		log.Errorf(ERROR.String())
+		Debugf(DEBUG.String())
+		Infof(INFO.String())
+		Printf(INFO.String())
+		Warnf(WARN.String())
+		Errorf(ERROR.String())
 
 		Go(func() {
-			log.Debugf(DEBUG.String())
-			log.Infof(INFO.String())
-			log.Printf(INFO.String())
-			log.Warnf(WARN.String())
-			log.Errorf(ERROR.String())
+			Debugf(DEBUG.String())
+			Infof(INFO.String())
+			Printf(INFO.String())
+			Warnf(WARN.String())
+			Errorf(ERROR.String())
 		})
 	})
 	time.Sleep(time.Second)
@@ -45,8 +45,8 @@ func TestPanic(t *testing.T) {
 		DefLevel: DEBUG,
 		Module:   "panic",
 	}))
-	log.Panic("test panic")
-	log.Info("never log")
+	Panic("test panic")
+	Info("never log")
 }
 
 func TestFatal(t *testing.T) {
@@ -55,6 +55,6 @@ func TestFatal(t *testing.T) {
 		DefLevel: DEBUG,
 		Module:   "fatal",
 	}))
-	log.Fatal("test fatal")
-	log.Info("never log")
+	Fatal("test fatal")
+	Info("never log")
 }

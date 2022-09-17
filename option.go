@@ -2,7 +2,7 @@ package log
 
 var (
 	defOption         = &Option{}
-	defaultSourceSkip = 4
+	defaultSourceSkip = 5
 )
 
 type Option struct {

@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	module string
+	c      config
 	pid    string
 	states sync.Map
 )
@@ -35,4 +35,11 @@ func getState(gids ...int64) state {
 		return state{}
 	}
 	return v.(state)
+}
+
+func setConfig(ss ...Setter) config {
+	for _, v := range ss {
+		v(&c)
+	}
+	return c
 }

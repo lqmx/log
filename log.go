@@ -3,14 +3,20 @@ package log
 import "github.com/petermattis/goid"
 
 var (
-	log Logger
+	log *logger
 )
 
 func init() {
-	log = New(Config{OutStd: true})
+	log = newLogger(
+		EnableStd(),
+		EnableColor(),
+		Module("DEFAULT"),
+	)
 }
 
-func SetLogger(logger Logger) { log = logger }
+func Set(ss ...Setter) {
+	log.setConfig(setConfig(ss...))
+}
 
 // SetTraceId
 // SetTraceId(gid int64, tranceId string)
@@ -68,6 +74,15 @@ func Go(fn func()) {
 	}()
 }
 
+func Trace(fn func()) {
+	if fn != nil {
+		gid := GetGoId()
+		SetTraceId(gid)
+		defer DelTraceId(gid)
+		fn()
+	}
+}
+
 func Must(err error) {
 	if err != nil {
 		Panicf("err:%v", err)
@@ -82,8 +97,8 @@ func Exit(err error) {
 
 func GetGoId() int64 { return goid.Get() }
 
-func Log(level Level, option *Option, params ...interface{}) { log.Log(level, option, params...) }
-func Logf(level Level, option *Option, format string, params ...interface{}) {
+func Log(level level, option *Option, params ...interface{}) { log.Log(level, option, params...) }
+func Logf(level level, option *Option, format string, params ...interface{}) {
 	log.Logf(level, option, format, params...)
 }
 func Debug(params ...interface{})                 { log.Debug(params...) }

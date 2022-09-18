@@ -6,35 +6,36 @@ import (
 	"time"
 )
 
-type Formatter func(level Level, msg string, option *Option) []byte
+type Formatter func(level level, msg string, option *Option) []byte
 
-func textFormatter(level Level, msg string, option *Option) []byte {
-	if option == nil {
-		option = defOption
-	}
-
-	var sourceString string
+func stdFormatter(level level, msg string, option *Option) []byte {
+	var ss string
 	if option.SourceString != "" {
-		sourceString = option.SourceString
+		ss = option.SourceString
 	} else {
-		sourceString = source(option.AddSourceSkip + defaultSourceSkip)
+		ss = source(option.AddSourceSkip + defaultSourceSkip)
 	}
 
-	levelString := level.ShortString()
-	if !option.NoColor {
-		levelString = level.ColorShortString()
+	var ls = level.ShortString()
+	if option.c.color {
+		ls = level.ColorShortString()
 	}
 
 	gid := GetGoId()
 	s := getState(gid)
 	now := time.Now()
 
+	traceId := s.traceId
+	if traceId != "" {
+		traceId = now.Format("0215")+traceId
+	}
+
 	var b bytes.Buffer
 	b.WriteString(fmt.Sprintf("%s %s(%s,%d) %s <%s> %s %s\n",
-		levelString, module, pid, gid,
+		ls, option.c.module, pid, gid,
 		now.Format("06-01-02T15:04:05.0000"),
-		now.Format("0215-")+s.traceId,
-		sourceString, msg,
+		traceId,
+		ss, msg,
 	))
 
 	return b.Bytes()

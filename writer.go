@@ -7,4 +7,3 @@ type Writer interface {
 	Sync() error
 	Flush() error
 }
-

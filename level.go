@@ -4,10 +4,10 @@ import (
 	"fmt"
 )
 
-type Level int8
+type level int8
 
 const (
-	DEBUG Level = iota - 1
+	DEBUG level = iota - 1
 	INFO
 	WARN
 	ERROR
@@ -15,7 +15,7 @@ const (
 	FATAL
 )
 
-func (l Level) String() string {
+func (l level) String() string {
 	switch l {
 	case DEBUG:
 		return "debug"
@@ -34,7 +34,7 @@ func (l Level) String() string {
 	}
 }
 
-func (l Level) ShortString() string {
+func (l level) ShortString() string {
 	switch l {
 	case DEBUG:
 		return "D"
@@ -53,21 +53,21 @@ func (l Level) ShortString() string {
 	}
 }
 
-func (l Level) ColorShortString() string {
+func (l level) ColorShortString() string {
 	switch l {
 	case DEBUG:
-		return "\u001B[106mD\u001B[0m"
+		return "\u001B[106m \u001B[0m"
 	case INFO:
-		return "\u001B[102mI\u001B[0m"
+		return "\u001B[102m \u001B[0m"
 	case WARN:
-		return "\u001B[103mW\u001B[0m"
+		return "\u001B[103m \u001B[0m"
 	case ERROR:
-		return "\u001B[101mE\u001B[0m"
+		return "\u001B[101m \u001B[0m"
 	case PANIC:
-		return "\u001B[105mP\u001B[0m"
+		return "\u001B[105m \u001B[0m"
 	case FATAL:
-		return "\u001B[107mF\u001B[0m"
+		return "\u001B[107m \u001B[0m"
 	default:
-		return fmt.Sprintf("\u001B[104m%d\u001B[0m", l)
+		return "\u001B[104m \u001B[0m"
 	}
 }

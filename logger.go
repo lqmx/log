@@ -1,5 +1,7 @@
 package log
 
+import "os"
+
 type Logger interface {
 	Debug(params ...interface{})
 	Debugf(format string, params ...interface{})
@@ -22,103 +24,107 @@ type Logger interface {
 	Fatal(params ...interface{})
 	Fatalf(format string, params ...interface{})
 
-	Log(level Level, option *Option, params ...interface{})
-	Logf(level Level, option *Option, format string, params ...interface{})
-}
-
-type Config struct {
-	OutStd    bool
-	DefLevel  Level
-	Module    string
-	Formatter Formatter
+	Log(level level, option *Option, params ...interface{})
+	Logf(level level, option *Option, format string, params ...interface{})
 }
 
 type logger struct {
-	c *Config
-	f Formatter
+	c *config
 	w Writer
 }
 
-func New(c Config) Logger {
+func newLogger(ss ...Setter) *logger {
 	var l logger
-	SetTraceId()
 
-	if c.Module == "" {
-		c.Module = "UNKNOWN"
+	for _, s := range ss {
+		s(&c)
 	}
-	if c.Formatter == nil {
-		c.Formatter = textFormatter
-	}
-
-	module = c.Module
 	l.c = &c
+
 	return &l
 }
 
+func (l logger) setConfig(c config) {
+	l.c = &c
+}
+
 func (l logger) Debug(params ...interface{}) {
-	write(l, DEBUG, defOption, "", params...)
+	l.log(DEBUG, nil, "", params...)
 }
 
 func (l logger) Debugf(format string, params ...interface{}) {
-	write(l, DEBUG, defOption, format, params...)
+	l.log(DEBUG, nil, format, params...)
 }
 
 func (l logger) Info(params ...interface{}) {
-	write(l, INFO, defOption,  "", params...)
+	l.log(INFO, nil, "", params...)
 }
 
 func (l logger) Infof(format string, params ...interface{}) {
-	write(l, INFO, defOption,  format, params...)
+	l.log(INFO, nil, format, params...)
 }
 
 func (l logger) Print(params ...interface{}) {
-	write(l, INFO, defOption,  "", params...)
+	l.log(INFO, nil, "", params...)
 }
 
 func (l logger) Printf(format string, params ...interface{}) {
-	write(l, INFO, defOption,  format, params...)
+	l.log(INFO, nil, format, params...)
 }
 
 func (l logger) Warn(params ...interface{}) {
-	write(l, WARN, defOption,  "", params...)
+	l.log(WARN, nil, "", params...)
 }
 
 func (l logger) Warnf(format string, params ...interface{}) {
-	write(l, WARN, defOption,  format, params...)
+	l.log(WARN, nil, format, params...)
 }
 
 func (l logger) Error(params ...interface{}) {
-	write(l, ERROR, defOption,  "", params...)
+	l.log(ERROR, nil, "", params...)
 }
 
 func (l logger) Errorf(format string, params ...interface{}) {
-	write(l, ERROR, defOption,  format, params...)
+	l.log(ERROR, nil, format, params...)
 }
 
 func (l logger) Panic(params ...interface{}) {
-	write(l, PANIC, defOption,  "", params...)
-	afterPanic(l, defOption)
+	l.log(PANIC, nil, "", params...)
 }
 
 func (l logger) Panicf(format string, params ...interface{}) {
-	write(l, PANIC, defOption,  format, params...)
-	afterPanic(l, defOption)
+	l.log(PANIC, nil, format, params...)
 }
 
 func (l logger) Fatal(params ...interface{}) {
-	write(l, FATAL, defOption,  "", params...)
-	afterFatal(l, defOption)
+	l.log(FATAL, nil, "", params...)
 }
 
 func (l logger) Fatalf(format string, params ...interface{}) {
-	write(l, FATAL, defOption,  format, params...)
-	afterFatal(l, defOption)
+	l.log(FATAL, nil, format, params...)
 }
 
-func (l logger) Log(level Level, option *Option, params ...interface{}) {
-	write(l, level, option,  "", params...)
+func (l logger) Log(level level, option *Option, params ...interface{}) {
+	l.log(level, option, "", params...)
 }
 
-func (l logger) Logf(level Level, option *Option, format string, params ...interface{}) {
-	write(l, level, option,  format, params...)
+func (l logger) Logf(level level, option *Option, format string, params ...interface{}) {
+	l.log(level, option, format, params...)
+}
+
+func (l logger) log(level level, option *Option, format string, params ...interface{}) {
+	if option == nil {
+		option = newDefOption()
+	}
+	option.c = *l.c
+
+	write(l, level, option, format, params...)
+
+	if level == FATAL {
+		printStack(l, PANIC, option, 4)
+		os.Exit(1)
+	} else if level == PANIC {
+		printStack(l, PANIC, option, 4)
+		panic("")
+	}
 }

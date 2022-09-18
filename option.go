@@ -1,13 +1,16 @@
 package log
 
 var (
-	defOption         = &Option{}
-	defaultSourceSkip = 5
+	defaultSourceSkip = 6
 )
 
 type Option struct {
 	AddSourceSkip int
 	SourceString  string
-	NoColor       bool
-	isPrint       bool
+
+	c config
+}
+
+func newDefOption() *Option {
+	return &Option{}
 }

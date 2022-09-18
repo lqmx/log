@@ -2,7 +2,6 @@ package log
 
 import (
 	"fmt"
-	"os"
 	"path"
 	"runtime"
 	"strings"
@@ -31,8 +30,8 @@ func source(skip int) string {
 	return fmt.Sprintf("%s:%d:%s", path.Join(filePath, path.Base(callerFile)), callerLine, callerName)
 }
 
-func write(logger logger, l Level, o *Option, format string, params ...interface{}) {
-	if l < logger.c.DefLevel {
+func write(logger logger, l level, o *Option, format string, params ...interface{}) {
+	if l < logger.c.level {
 		return
 	}
 
@@ -43,36 +42,19 @@ func write(logger logger, l Level, o *Option, format string, params ...interface
 		m = fmt.Sprintf(format, params...)
 	}
 
-	if o.isPrint {
-		fmt.Print(string(textFormatter(l, m, o)))
-		return
-	}
-
-	if logger.c.OutStd {
-		fmt.Print(string(textFormatter(l, m, o)))
+	if logger.c.std {
+		fmt.Print(string(stdFormatter(l, m, o)))
 	}
 
 	if logger.w != nil {
-		_, err := logger.w.Write(logger.f(l, m, o))
+		_, err := logger.w.Write(logger.c.fmt(l, m, o))
 		if err != nil {
-			write(logger, ERROR, &Option{
-				isPrint: true,
-			}, "err:%v", err)
+			write(logger, ERROR, o, "err:%v", err)
 		}
 	}
 }
 
-func afterPanic(logger logger, o *Option) {
-	printStack(logger, PANIC, o, 4)
-	panic("")
-}
-
-func afterFatal(logger logger, o *Option) {
-	printStack(logger, FATAL, o, 4)
-	os.Exit(1)
-}
-
-func printStack(logger logger, l Level, o *Option, skip int) {
+func printStack(logger logger, l level, o *Option, skip int) {
 	for ; ; skip++ {
 		pc, file, line, ok := runtime.Caller(skip)
 		if !ok {
@@ -82,6 +64,9 @@ func printStack(logger logger, l Level, o *Option, skip int) {
 		if name.Name() == "runtime.goexit" {
 			break
 		}
-		write(logger, l, o, "#STACK: %s %s:%d", name.Name(), file, line)
+		write(logger, l, &Option{
+			c: o.c,
+			AddSourceSkip: 1,
+		}, "#STACK: %s %s:%d", name.Name(), file, line)
 	}
 }

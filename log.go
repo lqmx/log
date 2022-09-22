@@ -12,6 +12,7 @@ func init() {
 		EnableColor(),
 		Module("DEFAULT"),
 	)
+	SetTraceId()
 }
 
 func Set(ss ...Setter) {

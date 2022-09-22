@@ -26,8 +26,8 @@ func source(skip int) string {
 	if ok {
 		callerName = runtime.FuncForPC(pc).Name()
 	}
-	filePath, _ := getPackageName(callerName)
-	return fmt.Sprintf("%s:%d:%s", path.Join(filePath, path.Base(callerFile)), callerLine, callerName)
+	filePath, fileFunc := getPackageName(callerName)
+	return fmt.Sprintf("%s:%d:%s", path.Join(filePath, path.Base(callerFile)), callerLine, fileFunc)
 }
 
 func write(logger logger, l level, o *Option, format string, params ...interface{}) {
@@ -55,6 +55,9 @@ func write(logger logger, l level, o *Option, format string, params ...interface
 }
 
 func printStack(logger logger, l level, o *Option, skip int) {
+	no := *o
+	no.c = o.c
+	no.AddSourceSkip += 1
 	for ; ; skip++ {
 		pc, file, line, ok := runtime.Caller(skip)
 		if !ok {
@@ -64,9 +67,6 @@ func printStack(logger logger, l level, o *Option, skip int) {
 		if name.Name() == "runtime.goexit" {
 			break
 		}
-		write(logger, l, &Option{
-			c: o.c,
-			AddSourceSkip: 1,
-		}, "#STACK: %s %s:%d", name.Name(), file, line)
+		write(logger, l, &no, "#STACK: %s %s:%d", name.Name(), file, line)
 	}
 }

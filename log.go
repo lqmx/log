@@ -85,13 +85,13 @@ func Trace(fn func()) {
 
 func Must(err error) {
 	if err != nil {
-		Panicf("err:%v", err)
+		Logf(PANIC, &Option{AddSourceSkip: 1}, "err:%v", err)
 	}
 }
 
 func Exit(err error) {
 	if err != nil {
-		Fatalf("err:%v", err)
+		Logf(FATAL, &Option{AddSourceSkip: 1}, "err:%v", err)
 	}
 }
 

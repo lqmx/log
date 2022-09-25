@@ -6,9 +6,9 @@ import (
 	"time"
 )
 
-type Formatter func(level level, msg string, option *Option) []byte
+type Formatter func(level Level, msg string, option *Option) []byte
 
-func stdFormatter(level level, msg string, option *Option) []byte {
+func stdFormatter(level Level, msg string, option *Option) []byte {
 	var ss string
 	if option.SourceString != "" {
 		ss = option.SourceString
@@ -27,7 +27,7 @@ func stdFormatter(level level, msg string, option *Option) []byte {
 
 	traceId := s.traceId
 	if traceId != "" {
-		traceId = now.Format("0215")+traceId
+		traceId = now.Format("0215") + traceId
 	}
 
 	var b bytes.Buffer

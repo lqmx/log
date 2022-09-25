@@ -11,6 +11,7 @@ func init() {
 		EnableStd(),
 		EnableColor(),
 		Module("DEFAULT"),
+		WithPsLevel(PANIC),
 	)
 	SetTraceId()
 }
@@ -98,8 +99,8 @@ func Exit(err error) {
 
 func GetGoId() int64 { return goid.Get() }
 
-func Log(level level, option *Option, params ...interface{}) { log.Log(level, option, params...) }
-func Logf(level level, option *Option, format string, params ...interface{}) {
+func Log(level Level, option *Option, params ...interface{}) { log.Log(level, option, params...) }
+func Logf(level Level, option *Option, format string, params ...interface{}) {
 	log.Logf(level, option, format, params...)
 }
 func Debug(params ...interface{})                 { log.Debug(params...) }

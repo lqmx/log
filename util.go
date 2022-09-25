@@ -30,7 +30,7 @@ func source(skip int) string {
 	return fmt.Sprintf("%s:%d:%s", path.Join(filePath, path.Base(callerFile)), callerLine, fileFunc)
 }
 
-func write(logger logger, l level, o *Option, format string, params ...interface{}) {
+func write(logger logger, l Level, o *Option, format string, params ...interface{}) {
 	if l < logger.c.level {
 		return
 	}
@@ -46,15 +46,18 @@ func write(logger logger, l level, o *Option, format string, params ...interface
 		fmt.Print(string(stdFormatter(l, m, o)))
 	}
 
-	if logger.w != nil {
-		_, err := logger.w.Write(logger.c.fmt(l, m, o))
+	if logger.c.writer != nil {
+		_, err := logger.c.writer.Write(logger.c.fmt(l, m, o))
 		if err != nil {
 			write(logger, ERROR, o, "err:%v", err)
 		}
 	}
 }
 
-func printStack(logger logger, l level, o *Option, skip int) {
+func printStack(logger logger, l Level, o *Option, skip int) {
+	if l < logger.c.psLevel {
+		return
+	}
 	no := *o
 	no.c = o.c
 	no.AddSourceSkip += 1

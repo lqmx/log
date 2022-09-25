@@ -1,18 +1,32 @@
 package log
 
 type config struct {
-	level  level
-	std    bool
-	module string
-	fmt    Formatter
-	color  bool
+	level   Level
+	psLevel Level
+	std     bool
+	module  string
+	fmt     Formatter
+	color   bool
+	writer  Writer
 }
 
 type Setter func(c *config)
 
-func Level(l level) Setter {
+func WithLevel(l Level) Setter {
 	return func(c *config) {
 		c.level = l
+	}
+}
+
+func WithPsLevel(l Level) Setter {
+	return func(c *config) {
+		c.psLevel = l
+	}
+}
+
+func WithWriter(w Writer) Setter {
+	return func(c *config) {
+		c.writer = w
 	}
 }
 

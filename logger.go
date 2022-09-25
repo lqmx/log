@@ -24,13 +24,12 @@ type Logger interface {
 	Fatal(params ...interface{})
 	Fatalf(format string, params ...interface{})
 
-	Log(level level, option *Option, params ...interface{})
-	Logf(level level, option *Option, format string, params ...interface{})
+	Log(level Level, option *Option, params ...interface{})
+	Logf(level Level, option *Option, format string, params ...interface{})
 }
 
 type logger struct {
 	c *config
-	w Writer
 }
 
 func newLogger(ss ...Setter) *logger {
@@ -104,27 +103,26 @@ func (l logger) Fatalf(format string, params ...interface{}) {
 	l.log(FATAL, nil, format, params...)
 }
 
-func (l logger) Log(level level, option *Option, params ...interface{}) {
+func (l logger) Log(level Level, option *Option, params ...interface{}) {
 	l.log(level, option, "", params...)
 }
 
-func (l logger) Logf(level level, option *Option, format string, params ...interface{}) {
+func (l logger) Logf(level Level, option *Option, format string, params ...interface{}) {
 	l.log(level, option, format, params...)
 }
 
-func (l logger) log(level level, option *Option, format string, params ...interface{}) {
+func (l logger) log(level Level, option *Option, format string, params ...interface{}) {
 	if option == nil {
 		option = newDefOption()
 	}
 	option.c = *l.c
 
 	write(l, level, option, format, params...)
+	printStack(l, level, option, 4)
 
 	if level == FATAL {
-		printStack(l, PANIC, option, 4)
 		os.Exit(1)
 	} else if level == PANIC {
-		printStack(l, PANIC, option, 4)
 		panic("")
 	}
 }

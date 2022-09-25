@@ -7,7 +7,7 @@ import (
 
 func TestLog(t *testing.T) {
 
-	Set(Level(DEBUG), Module("log"), EnableStd(), EnableColor())
+	Set(WithLevel(DEBUG), Module("log"), EnableStd(), EnableColor())
 
 	Trace(func() {
 		Debugf(DEBUG.String())
